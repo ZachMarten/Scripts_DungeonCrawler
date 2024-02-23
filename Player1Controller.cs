@@ -7,8 +7,10 @@ using UnityEditor.SceneManagement;
 public class Player1Controller : MonoBehaviour
 {
     private Player thePlayer;
+    private Room theRoom;
     public TextMeshPro playerInfo;
     public float speed = 0;
+    public GameObject middleOfTheRoom;
     public GameObject northExit;
     public GameObject southExit;
     public GameObject eastExit;
@@ -38,8 +40,14 @@ public class Player1Controller : MonoBehaviour
     void Start()
     {
         this.turnOffExits();
+        this.middleOfTheRoom.SetActive(false);
+
         if (!MySingleton.currentDirection.Equals("?"))
         {
+            this.amMoving = true;
+            this.middleOfTheRoom.SetActive(true);
+            this.amAtMiddleOfRoom = false;
+            
             if(MySingleton.currentDirection.Equals("north"))
             {
                 this.gameObject.transform.position = this.southExit.transform.position;
@@ -57,10 +65,19 @@ public class Player1Controller : MonoBehaviour
                 this.gameObject.transform.position = this.westExit.transform.position;
             }
         }
+        else
+        {
+            this.amMoving = false;
+            this.amAtMiddleOfRoom = true;
+            this.middleOfTheRoom.SetActive(false);
+            this.gameObject.transform.position = this.middleOfTheRoom.transform.position;
+        }
         this.thePlayer = new Player("Mike");  
         this.thePlayer.display();
         SetPlayerInfo();
+        this.theRoom = new Room();
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -70,17 +87,22 @@ public class Player1Controller : MonoBehaviour
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {
+            this.middleOfTheRoom.SetActive(false);
+            this.turnOnExits();
             print("at middle of Room");
             this.amAtMiddleOfRoom = true;
             this.amMoving = false;
+            MySingleton.currentDirection = "middle";
+            print(this.getExitNum);
         }
     }
 
     void SetPlayerInfo()
     {
         playerInfo.text = this.thePlayer.getName() + " -> " + this.thePlayer.getHP();
-
     }
+
+    
 
     // Update is called once per frame
     void Update()
