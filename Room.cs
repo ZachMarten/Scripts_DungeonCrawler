@@ -5,21 +5,29 @@ using UnityEngine;
 public class Room
 {
     private string name;
-    private int exitNum;
+    private string[] theOpenDoors = new string[4];
+    private int howManyOpenDoors = 0;
 
     public Room(string name)
     {
         this.name = name;
-        this.exitNum = (int)Random.Range(1.0f, 4.0f);        
     }
 
-    public int getExitNum()
+    public void setOpenDoor(string direction)
     {
-        return this.exitNum;
+        this.theOpenDoors[this.howManyOpenDoors] = direction;
+        this.howManyOpenDoors++;
     }
 
-    public void display()
+    public bool isOpenDoor(string direction)
     {
-        Debug.Log(this.exitNum);
+        for(int i = 0; i < this.howManyOpenDoors; i++)
+        {
+            if(direction.Equals(this.theOpenDoors[i]))
+            {
+                return true;
+            }
+        }
+        return false; 
     }
 }
