@@ -6,8 +6,8 @@ using UnityEditor.SceneManagement;
 
 public class Player1Controller : MonoBehaviour
 {
-    private Player thePlayer;
-    public TextMeshPro playerInfo;
+    //private PlayerInfo thePlayer;
+    //public TextMeshPro playerInfo;
     public float speed = 0;
     public GameObject middleOfTheRoom;
     public GameObject northExit;
@@ -24,7 +24,6 @@ public class Player1Controller : MonoBehaviour
         this.southExit.gameObject.SetActive(false);
         this.eastExit.gameObject.SetActive(false);
         this.westExit.gameObject.SetActive(false);
-
     }
 
     private void turnOnExits()
@@ -50,18 +49,22 @@ public class Player1Controller : MonoBehaviour
             if(MySingleton.currentDirection.Equals("north"))
             {
                 this.gameObject.transform.position = this.southExit.transform.position;
+                this.gameObject.transform.LookAt(this.northExit.transform.position);
             }
             else if (MySingleton.currentDirection.Equals("south"))
             {
                 this.gameObject.transform.position = this.northExit.transform.position;
+                this.gameObject.transform.LookAt(this.southExit.transform.position);
             }
             else if (MySingleton.currentDirection.Equals("west"))
             {
                 this.gameObject.transform.position = this.eastExit.transform.position;
+                this.gameObject.transform.LookAt(this.westExit.transform.position);
             }
             else if (MySingleton.currentDirection.Equals("east"))
             {
                 this.gameObject.transform.position = this.westExit.transform.position;
+                this.gameObject.transform.LookAt(this.eastExit.transform.position);
             }
         }
         else
@@ -71,9 +74,9 @@ public class Player1Controller : MonoBehaviour
             this.middleOfTheRoom.SetActive(false);
             this.gameObject.transform.position = this.middleOfTheRoom.transform.position;
         }
-        this.thePlayer = new Player("Mike");  
-        this.thePlayer.display();
-        SetPlayerInfo();
+        //this.thePlayerInfo = new PlayerInfo("Mike");  
+        //this.thePlayerInfo.display();
+        //SetPlayerInfo();
     }
 
 
@@ -94,36 +97,16 @@ public class Player1Controller : MonoBehaviour
         }
     }
 
-    void SetPlayerInfo()
+    /*void SetPlayerInfo()
     {
-        playerInfo.text = this.thePlayer.getName() + " -> " + this.thePlayer.getHP();
+        playerInfo.text = this.thePlayerInfo.getName() + " -> " + this.thePlayerInfo.getHP();
     }
 
-    void rememberExits()
-    {
-        if(!MySingleton.theCurrentRoom.isOpenDoor("north"))
-        {
-            this.northExit.SetActive(false);
-        }
-        if(!MySingleton.theCurrentRoom.isOpenDoor("south"))
-        {
-            this.southExit.SetActive(false);
-        }
-        if(!MySingleton.theCurrentRoom.isOpenDoor("east"))
-        {
-            this.eastExit.SetActive(false);
-        }
-        if(!MySingleton.theCurrentRoom.isOpenDoor("west"))
-        {
-            this.westExit.SetActive(false);
-        }
-    }
-
+   */
     // Update is called once per frame
-    void Update()
+     void Update()
     {
-        this.rememberExits();
-        if (Input.GetKeyUp(KeyCode.UpArrow) && !this.amMoving && MySingleton.theCurrentRoom.isOpenDoor("north"))
+        if (Input.GetKeyUp(KeyCode.UpArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("north"))
         {
             this.amMoving = true;
             this.turnOnExits();
@@ -131,7 +114,7 @@ public class Player1Controller : MonoBehaviour
             this.gameObject.transform.LookAt(this.northExit.transform.position);
         }
 
-        if (Input.GetKeyUp(KeyCode.DownArrow) && !this.amMoving && MySingleton.theCurrentRoom.isOpenDoor("south"))
+        if (Input.GetKeyUp(KeyCode.DownArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("south"))
         {
             this.amMoving = true;
             this.turnOnExits();
@@ -139,7 +122,7 @@ public class Player1Controller : MonoBehaviour
             this.gameObject.transform.LookAt(this.southExit.transform.position);
         }
 
-        if (Input.GetKeyUp(KeyCode.LeftArrow) && !this.amMoving && MySingleton.theCurrentRoom.isOpenDoor("west"))
+        if (Input.GetKeyUp(KeyCode.LeftArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("west"))
         {
             this.amMoving = true;
             this.turnOnExits();
@@ -147,13 +130,12 @@ public class Player1Controller : MonoBehaviour
             this.gameObject.transform.LookAt(this.westExit.transform.position);
         }
 
-        if (Input.GetKeyUp(KeyCode.RightArrow) && !this.amMoving && MySingleton.theCurrentRoom.isOpenDoor("east"))
+        if (Input.GetKeyUp(KeyCode.RightArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("east"))
         {
             this.amMoving = true;
             this.turnOnExits();
             MySingleton.currentDirection = "east";
             this.gameObject.transform.LookAt(this.eastExit.transform.position);
-
         }
 
         //make the player move in the current direction
