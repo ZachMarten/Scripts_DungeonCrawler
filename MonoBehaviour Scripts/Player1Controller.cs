@@ -16,6 +16,9 @@ public class Player1Controller : MonoBehaviour
     public GameObject westExit;
     private bool amMoving = false;
     private bool amAtMiddleOfRoom = false;
+    private int powerLevel;
+    public TextMeshProUGUI powerLevelText;
+
 
 
     private void turnOffExits()
@@ -39,6 +42,7 @@ public class Player1Controller : MonoBehaviour
     {
         this.turnOffExits();
         this.middleOfTheRoom.SetActive(false);
+        
 
         if (!MySingleton.currentDirection.Equals("?"))
         {
@@ -74,6 +78,7 @@ public class Player1Controller : MonoBehaviour
             this.middleOfTheRoom.SetActive(false);
             this.gameObject.transform.position = this.middleOfTheRoom.transform.position;
         }
+        powerLevel = 0;
         //this.thePlayerInfo = new PlayerInfo("Mike");  
         //this.thePlayerInfo.display();
         //SetPlayerInfo();
@@ -84,7 +89,14 @@ public class Player1Controller : MonoBehaviour
     {
         if(other.CompareTag("door"))
         {
+            MySingleton.thePlayer.getCurrentRoom().removePlayer(MySingleton.currentDirection);
             EditorSceneManager.LoadScene("Dungeon");
+        }
+        else if(other.CompareTag("power-pellet"))
+        {
+            other.gameObject.SetActive(false);
+            powerLevel = powerLevel + 1;
+            SetPowerLevelText();
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {
@@ -97,15 +109,14 @@ public class Player1Controller : MonoBehaviour
         }
     }
 
-    /*void SetPlayerInfo()
-    {
-        playerInfo.text = this.thePlayerInfo.getName() + " -> " + this.thePlayerInfo.getHP();
-    }
-
-   */
+    void SetPowerLevelText() 
+   {
+       powerLevelText.text =  "Power Level: " + powerLevel.ToString();
+   }
     // Update is called once per frame
      void Update()
     {
+        SetPowerLevelText();
         if (Input.GetKeyUp(KeyCode.UpArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("north"))
         {
             this.amMoving = true;
