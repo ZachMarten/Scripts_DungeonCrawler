@@ -97,6 +97,10 @@ public class Player1Controller : MonoBehaviour
             other.gameObject.SetActive(false);
             powerLevel = powerLevel + 1;
             SetPowerLevelText();
+            Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
+            //theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction);
+            EditorSceneManager.LoadScene("FightRoom");
+
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {
