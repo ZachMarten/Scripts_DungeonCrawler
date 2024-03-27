@@ -79,6 +79,8 @@ public class Player1Controller : MonoBehaviour
             this.gameObject.transform.position = this.middleOfTheRoom.transform.position;
         }
         powerLevel = 0;
+        SetPowerLevelText();
+
         //this.thePlayerInfo = new PlayerInfo("Mike");  
         //this.thePlayerInfo.display();
         //SetPlayerInfo();
@@ -98,8 +100,10 @@ public class Player1Controller : MonoBehaviour
             powerLevel = powerLevel + 1;
             SetPowerLevelText();
             Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
-            //theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction);
-            EditorSceneManager.LoadScene("FightRoom");
+            theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction);
+            
+            
+            //EditorSceneManager.LoadScene("FightRoom");
 
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
@@ -120,7 +124,6 @@ public class Player1Controller : MonoBehaviour
     // Update is called once per frame
      void Update()
     {
-        SetPowerLevelText();
         if (Input.GetKeyUp(KeyCode.UpArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("north"))
         {
             this.amMoving = true;
