@@ -6,91 +6,99 @@ using TMPro;
 public class fightController : MonoBehaviour
 {
     public GameObject hero_GO, monster_GO;
-    public TextMeshPro hero_hp_TMP, monster_hp_TMP, fight_information_TMP, player_turn_TMP;
-    private int heroHP;
-    private int monsterHP;
-    private int heroArmorClass;
-    private int monsterArmorClass;
-    private int heroAttack;
-    private int monsterAttack;
-    private int heroDamage;
-    private int monsterDamage;
-    private bool heroTurn;
-    private bool monsterTurn;
-    private float speed = 2.0f;
-    public GameObject attackPosition, heroStartPosition, monsterStartPosition;
+    public TextMeshPro hero_hp_TMP, monster_hp_TMP, fight_information_TMP;
+    private GameObject currentAttacker;
+    private Animator theCurrentAnimator;
+    private Monster theMonster;
+    private bool shouldAttack = true;
+    
 
     // Start is called before the first frame update
     void Start()
     {
-        this.heroHP = 30;
-        this.monsterHP = 30;
-        this.heroArmorClass = 12;
-        this.monsterArmorClass = 14;
-        this.hero_hp_TMP.text = "Hero HP: " + this.heroHP;
-        this.monster_hp_TMP.text = "Monster HP: " + this.monsterHP;
-        this.monsterTurn = false;
-        this.heroTurn = true;
+        this.theMonster = new Monster("Blue Ghost");
+        this.hero_hp_TMP.text = "Current HP: " + MySingleton.thePlayer.getHP() + " AC: " + MySingleton.thePlayer.getAC();
+        this.monster_hp_TMP.text = "Current HP: " + this.theMonster.getHP() + " AC: " + this.theMonster.getAC();
 
+        int num = Random.Range(0, 2); //coin flip, will produce 0 and 1 (since 2 is not included)
+        if(num == 0)
+        {
+            this.currentAttacker = hero_GO;
+        }
+        else
+        {
+            this.currentAttacker = monster_GO;
+        }
+
+        StartCoroutine(fight());
+    }
+
+    private void tryAttack(Inhabitant attacker, Inhabitant defender)
+    {
+        //have attacker try to attack the defender
+        int attackRoll = Random.Range(0, 20)+1;
+        if(attackRoll >= defender.getAC())
+        {
+            //attacker will hit the defender, lets see how hard!!!!
+            int damageRoll = Random.Range(0, 4) + 2; //damage between 2 and 5
+            defender.takeDamage(damageRoll);
+            this.fight_information_TMP.text = "Attacker Hit!!!!";
+        }
+        else
+        {
+            this.fight_information_TMP.text = "Attacker Misses!!!!";
+        }
+    }
+
+    IEnumerator fight()
+    {
+        yield return new WaitForSeconds(2);
+        if (this.shouldAttack)
+        {
+            this.theCurrentAnimator = this.currentAttacker.GetComponent<Animator>();
+            this.theCurrentAnimator.SetTrigger("attack");
+            if (this.currentAttacker == this.hero_GO)
+            {
+                this.currentAttacker = this.monster_GO;
+                this.tryAttack(MySingleton.thePlayer, this.theMonster);
+                this.monster_hp_TMP.text = "Current HP: " + this.theMonster.getHP() + " AC: " + this.theMonster.getAC();
+
+                //now the defender may have fewer hp...check if their are dead?
+                if (this.theMonster.getHP() <= 0)
+                {
+                    this.fight_information_TMP.text = "Hero Wins!!!!!";
+                    this.shouldAttack = false;
+                }
+                else
+                {
+                    StartCoroutine(fight());
+                }
+                
+            }
+            else
+            {
+                this.currentAttacker = this.hero_GO;
+                this.tryAttack(this.theMonster, MySingleton.thePlayer);
+                this.hero_hp_TMP.text = "Current HP: " + MySingleton.thePlayer.getHP() + " AC: " + MySingleton.thePlayer.getAC();
+
+                //now the defender may have fewer hp...check if their are dead?
+                if (MySingleton.thePlayer.getHP() <= 0)
+                {
+                    this.fight_information_TMP.text = "Monster Wins!!!!!";
+                    this.shouldAttack = false;
+                }
+                else
+                {
+                    StartCoroutine(fight());
+                }
+            }
+        }
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        if (Input.GetKeyUp(KeyCode.UpArrow) && heroTurn.Equals(true))
-        {
-            this.heroAttack = (int)Random.Range(1.0f, 20.0f);
-            if(this.heroAttack > this.monsterArmorClass)
-            {
-                //this.fight_information_TMP.text = "Hero Attack Hit!";
-                this.heroDamage = (int)Random.Range(1.0f, 20.0f);
-                this.monsterHP = this.monsterHP - this.heroDamage;
-                this.monster_hp_TMP.text = "Monster HP: " + this.monsterHP;
-                this.heroTurn = false;
-                this.monsterTurn = true; 
-                //this.player_turn_TMP.text = "Monster Turn";
-            }
-            else
-            {
-                //this.fight_information_TMP.text = "Hero Attack Miss!";
-                this.heroTurn = false;
-                this.monsterTurn = true;
-                //this.player_turn_TMP.text = "Monster Turn";
-            }
-        }
-
-        if (Input.GetKeyUp(KeyCode.UpArrow) && monsterTurn.Equals(true))
-        {
-            this.monsterAttack = (int)Random.Range(1.0f, 20.0f);
-            if(this.monsterAttack > this.heroArmorClass)
-            {
-                //this.fight_information_TMP.text = "Monster Attack Hit!";
-                this.monsterDamage = (int)Random.Range(1.0f, 20.0f);
-                this.heroHP = this.heroHP - this.monsterDamage;
-                this.hero_hp_TMP.text = "Hero HP: " + this.heroHP;
-                this.monsterTurn = false;
-                this.heroTurn = true; 
-                //this.player_turn_TMP.text = "Hero Turn";
-            }
-            else
-            {
-                //this.fight_information_TMP.text = "Monster Attack Miss!";
-                this.monsterTurn = false;
-                this.heroTurn = true;
-                //this.player_turn_TMP.text = "Hero Turn";
-            }
-
-        }
-        if(this.monsterHP <= 0)
-        {
-            this.monster_hp_TMP.text = "Monster HP: 0";
-            this.fight_information_TMP.text = "Hero Wins!";
-        }
-        if(this.heroHP <= 0)
-        {
-            this.hero_hp_TMP.text = "Hero HP: 0";
-            this.fight_information_TMP.text = "Monster Wins";
-        }        
+                
     }
 }
