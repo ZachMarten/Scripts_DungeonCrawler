@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEditor.SceneManagement;
+
 
 public class fightController : MonoBehaviour
 {
@@ -9,7 +11,7 @@ public class fightController : MonoBehaviour
     public TextMeshPro hero_hp_TMP, monster_hp_TMP, fight_information_TMP;
     private GameObject currentAttacker;
     private Animator theCurrentAnimator;
-    private Monster theMonster;
+    public Monster theMonster;
     private bool shouldAttack = true;
     
 
@@ -35,6 +37,7 @@ public class fightController : MonoBehaviour
 
     private void tryAttack(Inhabitant attacker, Inhabitant defender)
     {
+        this.fight_information_TMP.text = "";
         //have attacker try to attack the defender
         int attackRoll = Random.Range(0, 20)+1;
         if(attackRoll >= defender.getAC())
@@ -68,6 +71,8 @@ public class fightController : MonoBehaviour
                 {
                     this.fight_information_TMP.text = "Hero Wins!!!!!";
                     this.shouldAttack = false;
+                    yield return new WaitForSeconds(5);
+                    EditorSceneManager.LoadScene("Dungeon");
                 }
                 else
                 {
@@ -86,6 +91,8 @@ public class fightController : MonoBehaviour
                 {
                     this.fight_information_TMP.text = "Monster Wins!!!!!";
                     this.shouldAttack = false;
+                    yield return new WaitForSeconds(4);
+                    EditorSceneManager.LoadScene("Dungeon");
                 }
                 else
                 {

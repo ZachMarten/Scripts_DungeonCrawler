@@ -1,25 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using UnityEditor.SceneManagement;
 
 public class Player1Controller : MonoBehaviour
 {
-    //private PlayerInfo thePlayer;
-    //public TextMeshPro playerInfo;
-    public float speed = 0;
-    public GameObject middleOfTheRoom;
     public GameObject northExit;
     public GameObject southExit;
     public GameObject eastExit;
     public GameObject westExit;
+    public GameObject middleOfTheRoom;
+    public float speed = 0;
     private bool amMoving = false;
     private bool amAtMiddleOfRoom = false;
-    private int powerLevel;
-    public TextMeshProUGUI powerLevelText;
-
-
 
     private void turnOffExits()
     {
@@ -27,6 +20,7 @@ public class Player1Controller : MonoBehaviour
         this.southExit.gameObject.SetActive(false);
         this.eastExit.gameObject.SetActive(false);
         this.westExit.gameObject.SetActive(false);
+
     }
 
     private void turnOnExits()
@@ -40,89 +34,105 @@ public class Player1Controller : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Rigidbody rb = this.gameObject.GetComponent<Rigidbody>();
+
+        //disable all exits when the scene first loads
         this.turnOffExits();
+
+        //disable the middle collider until we know what our initial state will be
+        //it should already be disabled by default, but for clarity, lets do it here
         this.middleOfTheRoom.SetActive(false);
-        
 
         if (!MySingleton.currentDirection.Equals("?"))
         {
+            //mark ourselves as moving since we are entering the scene through one of the exits
             this.amMoving = true;
+
+            //we will be positioning the player by one of the exits so we can turn on the middle collider
             this.middleOfTheRoom.SetActive(true);
             this.amAtMiddleOfRoom = false;
-            
-            if(MySingleton.currentDirection.Equals("north"))
+
+            if (MySingleton.currentDirection.Equals("north"))
             {
                 this.gameObject.transform.position = this.southExit.transform.position;
                 this.gameObject.transform.LookAt(this.northExit.transform.position);
+                //rb.MovePosition(this.southExit.transform.position);
             }
             else if (MySingleton.currentDirection.Equals("south"))
             {
                 this.gameObject.transform.position = this.northExit.transform.position;
                 this.gameObject.transform.LookAt(this.southExit.transform.position);
+                //rb.MovePosition(this.northExit.transform.position);
             }
             else if (MySingleton.currentDirection.Equals("west"))
             {
                 this.gameObject.transform.position = this.eastExit.transform.position;
                 this.gameObject.transform.LookAt(this.westExit.transform.position);
+                //rb.MovePosition(this.eastExit.transform.position);
             }
             else if (MySingleton.currentDirection.Equals("east"))
             {
                 this.gameObject.transform.position = this.westExit.transform.position;
                 this.gameObject.transform.LookAt(this.eastExit.transform.position);
+                //rb.MovePosition(this.westExit.transform.position);
             }
+            //StartCoroutine(turnOnMiddle());
         }
         else
         {
+            //We will be positioning the play at the middle
+            //so keep the middle collider off for this run of the scene
             this.amMoving = false;
             this.amAtMiddleOfRoom = true;
             this.middleOfTheRoom.SetActive(false);
             this.gameObject.transform.position = this.middleOfTheRoom.transform.position;
         }
-        powerLevel = 0;
-        SetPowerLevelText();
-
-        //this.thePlayerInfo = new PlayerInfo("Mike");  
-        //this.thePlayerInfo.display();
-        //SetPlayerInfo();
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("door"))
         {
+
+            //remove the player from the current room and place him into the destination, prior to loading the new scene
             MySingleton.thePlayer.getCurrentRoom().removePlayer(MySingleton.currentDirection);
+
             EditorSceneManager.LoadScene("Dungeon");
         }
         else if(other.CompareTag("power-pellet"))
         {
-            other.gameObject.SetActive(false);
-            powerLevel = powerLevel + 1;
-            SetPowerLevelText();
-            Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
-            theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction);
-            
-            
-            //EditorSceneManager.LoadScene("FightRoom");
+            EditorSceneManager.LoadScene("FightRoom");
 
+            if(fightController.theMonster.getHP() <=0)
+            {
+                other.gameObject.SetActive(false); //visually make pellet disappear
+
+                //programatically  make sure the pellet doesnt show up again
+                Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
+                theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction);
+            } 
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {
+            //we have hit the middle of the room, so lets turn off the collider
+            //until the next run of the scene to avoid additional collisions
+
             this.middleOfTheRoom.SetActive(false);
             this.turnOnExits();
-            print("at middle of Room");
+
+            print("middle");
             this.amAtMiddleOfRoom = true;
             this.amMoving = false;
             MySingleton.currentDirection = "middle";
         }
+        else
+        {
+            //print("spomethilskdfjskldjfsdjkl");
+        }
     }
 
-    void SetPowerLevelText() 
-   {
-       powerLevelText.text =  "Power Level: " + powerLevel.ToString();
-   }
     // Update is called once per frame
-     void Update()
+    void Update()
     {
         if (Input.GetKeyUp(KeyCode.UpArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("north"))
         {
@@ -154,6 +164,7 @@ public class Player1Controller : MonoBehaviour
             this.turnOnExits();
             MySingleton.currentDirection = "east";
             this.gameObject.transform.LookAt(this.eastExit.transform.position);
+
         }
 
         //make the player move in the current direction
@@ -178,8 +189,3 @@ public class Player1Controller : MonoBehaviour
         }
     }
 }
-    
-
-
-
-

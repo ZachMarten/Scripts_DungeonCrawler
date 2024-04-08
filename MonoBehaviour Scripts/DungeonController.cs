@@ -20,6 +20,7 @@ public class DungeonController : MonoBehaviour
         if (theCurrentRoom.hasExit("north"))
         {
             this.northDoor.SetActive(false);
+
         }
 
         if (theCurrentRoom.hasExit("south"))
@@ -45,7 +46,6 @@ public class DungeonController : MonoBehaviour
         if (!theCurrentRoom.hasPellet("north"))
         {
             this.northPellet.SetActive(false);
-
         }
         if (!theCurrentRoom.hasPellet("south"))
         {
