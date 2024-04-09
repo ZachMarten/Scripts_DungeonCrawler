@@ -8,7 +8,11 @@ public class Player : Inhabitant
 
     public Player(string name) : base(name)
     {
+
     }
 
-    
+    public void resetStats()
+    {
+        this.hp = this.maxHP;
+    }
 }

@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.SceneManagement;
+using TMPro;
 
 public class Player1Controller : MonoBehaviour
 {
+    public TextMeshPro pellet_TMP;
     public GameObject northExit;
     public GameObject southExit;
     public GameObject eastExit;
@@ -34,7 +36,7 @@ public class Player1Controller : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Rigidbody rb = this.gameObject.GetComponent<Rigidbody>();
+        this.pellet_TMP.text = "" + MySingleton.currentPellets;
 
         //disable all exits when the scene first loads
         this.turnOffExits();
@@ -101,16 +103,12 @@ public class Player1Controller : MonoBehaviour
         }
         else if(other.CompareTag("power-pellet"))
         {
-            EditorSceneManager.LoadScene("FightRoom");
+            EditorSceneManager.LoadScene("FightRoom");            
+            other.gameObject.SetActive(false); //visually make pellet disappear
 
-            if(fightController.theMonster.getHP() <=0)
-            {
-                other.gameObject.SetActive(false); //visually make pellet disappear
-
-                //programatically  make sure the pellet doesnt show up again
-                Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
-                theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction);
-            } 
+            //programatically  make sure the pellet doesnt show up again
+            Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
+            theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction);
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {

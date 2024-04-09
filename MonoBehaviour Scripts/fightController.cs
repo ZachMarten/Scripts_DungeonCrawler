@@ -7,6 +7,7 @@ using UnityEditor.SceneManagement;
 
 public class fightController : MonoBehaviour
 {
+    private bool isFightOver = false;
     public GameObject hero_GO, monster_GO;
     public TextMeshPro hero_hp_TMP, monster_hp_TMP, fight_information_TMP;
     private GameObject currentAttacker;
@@ -31,8 +32,8 @@ public class fightController : MonoBehaviour
         {
             this.currentAttacker = monster_GO;
         }
-
-        StartCoroutine(fight());
+        this.fight_information_TMP.text = "Press the up arrow to begin the fight. Press the down arrow to visit the shop.";
+        
     }
 
     private void tryAttack(Inhabitant attacker, Inhabitant defender)
@@ -43,9 +44,19 @@ public class fightController : MonoBehaviour
         if(attackRoll >= defender.getAC())
         {
             //attacker will hit the defender, lets see how hard!!!!
-            int damageRoll = Random.Range(0, 4) + 2; //damage between 2 and 5
-            defender.takeDamage(damageRoll);
-            this.fight_information_TMP.text = "Attacker Hit!!!!";
+            if(MySingleton.hasItem == true)
+            {
+                int damageRoll = Random.Range(0, 4) + 5; //damage between 5 and 8 with added pellet boost
+                defender.takeDamage(damageRoll);
+                this.fight_information_TMP.text = "Attacker Hit!!!!";
+            }
+            else
+            {
+                int damageRoll = Random.Range(0, 4) + 2; //damage between 2 and 5
+                defender.takeDamage(damageRoll);
+                this.fight_information_TMP.text = "Attacker Hit!!!!";
+            }
+            
         }
         else
         {
@@ -69,11 +80,11 @@ public class fightController : MonoBehaviour
                 //now the defender may have fewer hp...check if their are dead?
                 if (this.theMonster.getHP() <= 0)
                 {
-                    this.fight_information_TMP.text = "Hero Wins!!!!!";
+                    this.fight_information_TMP.text = "Hero Wins! Press Space to return to the dungeon.";
                     this.shouldAttack = false;
-                    yield return new WaitForSeconds(5);
-                    EditorSceneManager.LoadScene("Dungeon");
-                }
+                    this.isFightOver = true;
+                    MySingleton.currentPellets++;
+                }    
                 else
                 {
                     StartCoroutine(fight());
@@ -89,10 +100,9 @@ public class fightController : MonoBehaviour
                 //now the defender may have fewer hp...check if their are dead?
                 if (MySingleton.thePlayer.getHP() <= 0)
                 {
-                    this.fight_information_TMP.text = "Monster Wins!!!!!";
+                    this.fight_information_TMP.text = "Monster Wins! Press Space to return to the dungeon.";
                     this.shouldAttack = false;
-                    yield return new WaitForSeconds(4);
-                    EditorSceneManager.LoadScene("Dungeon");
+                    this.isFightOver = true;
                 }
                 else
                 {
@@ -106,6 +116,19 @@ public class fightController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-                
+        if(Input.GetKeyUp(KeyCode.UpArrow))
+        {
+            StartCoroutine(fight());
+        }
+        if(Input.GetKeyUp(KeyCode.DownArrow))
+        {
+            EditorSceneManager.LoadScene("ShopKeeperScene");
+        }
+
+        if(isFightOver = true && Input.GetKeyUp(KeyCode.Space))
+        {
+            MySingleton.thePlayer.resetStats();
+            EditorSceneManager.LoadScene("Dungeon");
+        }
     }
 }
