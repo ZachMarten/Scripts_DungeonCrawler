@@ -43,19 +43,10 @@ public class fightController : MonoBehaviour
         int attackRoll = Random.Range(0, 20)+1;
         if(attackRoll >= defender.getAC())
         {
-            //attacker will hit the defender, lets see how hard!!!!
-            if(MySingleton.hasItem == true)
-            {
-                int damageRoll = Random.Range(0, 4) + 5; //damage between 5 and 8 with added pellet boost
-                defender.takeDamage(damageRoll);
-                this.fight_information_TMP.text = "Attacker Hit!!!!";
-            }
-            else
-            {
-                int damageRoll = Random.Range(0, 4) + 2; //damage between 2 and 5
-                defender.takeDamage(damageRoll);
-                this.fight_information_TMP.text = "Attacker Hit!!!!";
-            }
+            //attacker will hit the defender, lets see how hard!!!!            
+            int damageRoll = Random.Range(0, 4) + 2; //damage between 2 and 5
+            defender.takeDamage(damageRoll);
+            this.fight_information_TMP.text = "Attacker Hit!!!!";
             
         }
         else
