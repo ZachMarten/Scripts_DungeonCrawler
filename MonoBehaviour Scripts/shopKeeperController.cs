@@ -9,7 +9,7 @@ using UnityEditor.SceneManagement;
 
 public class ShopController : MonoBehaviour
 {
-    public TextMeshPro playerTMP, itemTMP, item1TMP, item2TMP, item3TMP, item4TMP;
+    public TextMeshPro playerTMP, itemTMP;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +29,7 @@ public class ShopController : MonoBehaviour
         // Output the data to the console
         foreach (var item in root.items)
         {
-            print($"Name: {item.name}, Stat Impacted: {item.stat_impacted}, Modifier: {item.modifier}");
+            print($"Name: {item.name}, Stat Impacted: {item.stat_impacted}, Modifier: {item.modifier}, Cost: {item.cost}");
         }
 
     }
