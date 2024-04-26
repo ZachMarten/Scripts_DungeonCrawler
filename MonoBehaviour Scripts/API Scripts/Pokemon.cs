@@ -86,6 +86,6 @@ public class Crypto
 
     public void display()
     {
-        Debug.Log($"Name: {this.name}, Price: {this.priceUsd}");
+        Debug.Log($"Name: {this.name}, Price: {this.priceUsd}, ID: {this.id}, Rank: {this.rank}, Symbol: {this.symbol}, Supply: {this.supply}, Max Supply: {this.maxSupply}, Market Cap: {this.marketCapUsd}, Volume: {this.volumeUsd24Hr}, Change Percent: {this.changePercent24Hr}, VWap: {this.vwap24Hr}, Explorer: {this.explorer}");
     }     
 }  
