@@ -7,12 +7,14 @@ using System;
 
 public class pokemonAPI : MonoBehaviour
 {
+    string api = "api.coincap.io/v2/assets";
     void Start()
     {
-        StartCoroutine(GetRequest("https://pokeapi.co/api/v2/ability/?offset=0&limit=2000"));
+        StartCoroutine(GetCryptoRequest("api.coincap.io/v2/assets"));
+        //StartCoroutine(GetRequest("https://pokeapi.co/api/v2/ability/?offset=0&limit=2000"));
     }
 
-    IEnumerator GetRequest(string uri)
+    /*IEnumerator GetRequest(string uri)
     {
         using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
         {
@@ -27,30 +29,36 @@ public class pokemonAPI : MonoBehaviour
             else
             {
                 // Show results as text
-                    using (StreamReader reader = new StreamReader("https://pokeapi.co/api/v2/ability/?offset=0&limit=2000"))
-                    {
-                        string line;
-                        string[] itemParts = new string[2];
+                string jsonString = webRequest.downloadHandler.text;
 
-                        int pos = 0;
-                        // Read and display lines from the file until the end of the file is reached
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            string[] parts = line.Split(",");
-                            for (int i = 0; i < parts.Length; i++)
-                            {
-                                print(parts[i]);
-                                itemParts[pos % 2] = parts[i];
-                                pos++;
-                            }
-                            Item theItem = new Item(itemParts[0], int.Parse(itemParts[1]));
-                            theItem.display();
-                        }
-                    }
-                    
-                print(webRequest.downloadHandler.text);
+                // Parse the JSON string
+                
                 // Or retrieve results as binary data
                 //byte[] results = webRequest.downloadHandler.data;
+            }
+        }
+    }*/
+
+    IEnumerator GetCryptoRequest(string uri)
+    {
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+        {
+     
+            // Request and wait for the desired page.
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || webRequest.result == UnityWebRequest.Result.ProtocolError)
+            {
+                print("Error: " + webRequest.error);
+            }
+            else
+            {
+                // Show results as text
+                string jsonString = webRequest.downloadHandler.text;
+                
+                Debug.Log(jsonString);
+                CollectionOfCrypto theCollectionOfCrypto = JsonUtility.FromJson<CollectionOfCrypto>(jsonString);
+                theCollectionOfCrypto.display();
             }
         }
     }
